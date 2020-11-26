@@ -1,6 +1,8 @@
 import {useState} from 'react';
 import {Formik, Form, Field, ErrorMessage} from 'formik';
 import Axios from 'axios';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
 
 
 // Regular expression to validate given url
@@ -40,9 +42,21 @@ const validate = values => {
     return errors;
 }
 
+toast.configure();
 function AddMovieForm() {
     // Define hook for range slider
     const [range, setRange] = useState(5);
+
+    // Toast notifications
+    const notify = (message, type) => {
+        if(type === "success"){
+            toast.success(message, {position: toast.POSITION.TOP_CENTER});
+        }
+        else{
+            toast.error(message, {position: toast.POSITION.TOP_CENTER});
+        }
+        
+    }
 
     // Defining action upon valid submission
     const onSubmit = values => {
@@ -52,12 +66,13 @@ function AddMovieForm() {
         // Posting to server
         Axios.post("http://localhost:80/movie-comparison/server/movies/create", data).then(response => {
             // Handle server response
-            
-            console.log(response);
-
+            notify("We got it!\nMovie added successfully.", "success");
         }).catch(error => {
             // Handle failure
-            console.log(error.response);
+            if(error.response.status === 400){
+                // Movie exists
+                notify("Sorry, movie name already exists.", "fail");
+            }
         });
 
     };
@@ -86,8 +101,6 @@ function AddMovieForm() {
                     <Field type="text" id="imdb_url" name="imdb_url" className="form-control form-control-lg" />
                     <ErrorMessage name="imdb_url" component="span" className="invalid-feedback" style={{display: "block"}}/>
                 </div>
-
-                {/* <RangeBar /> */}
 
                 <div className="form-group">
                     <div className="slidecontainer">

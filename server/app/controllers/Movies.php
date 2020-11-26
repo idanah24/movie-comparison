@@ -1,7 +1,5 @@
 <?php
 
-
-
 class Movies extends Controller {
 
     private $movies;
