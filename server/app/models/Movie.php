@@ -24,7 +24,9 @@ class Movie {
         return true;
     }
 
-
+    /*
+    This method returns all of the movies in the movies table
+    */
     public function getAll(){
         $this->db->query('SELECT * FROM movies');
         $this->db->execute();
@@ -32,6 +34,10 @@ class Movie {
         return $all_movies;
     }
 
+
+    /*
+    This method returns a movie by id, returns an empty array if not found
+    */
     public function getById($id){
         $this->db->query('SELECT * FROM movies WHERE movies.id=:id', ['id' => $id]);
         $this->db->execute();
@@ -42,10 +48,17 @@ class Movie {
         return $result;
     }
 
+
+
+    /*
+    This method take is an id and a details array, updates a movie information with details contained in argument
+    details array may vary and can include all/some of the information
+    returns boolean
+    */
     public function updateMovie($id, $details){
         if(count($this->getById($id)) == 0){
             // Movie dosen't exist
-            return;
+            return false;
         }
 
         // Set up query and bindings
@@ -60,13 +73,18 @@ class Movie {
 
         // Execute update
         $this->db->query($query, $details);
-        $this->db->execute();
+        return $this->db->execute();
+        
 
     }
 
+
+    /*
+    This method deletes a movie by a given id, returns boolean
+    */
     public function deleteMovie($id){
         $this->db->query('DELETE FROM movies where movies.id = :id', ['id' => $id]);
-        $this->db->execute();
+        return $this->db->execute();
     }
 
     

@@ -1,0 +1,1 @@
+export const SERVER_PATH = "http://ec2-15-237-63-16.eu-west-3.compute.amazonaws.com/movie-comparison";

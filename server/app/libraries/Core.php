@@ -8,7 +8,7 @@
 
 class Core {
 
-    protected $currentController = 'Publicc';
+    protected $currentController = 'Main';
     protected $currentMethod = 'Index';
     protected $params = [];
 

@@ -20,9 +20,13 @@ class Movies extends Controller {
         sends form values to model, creating a new movie
     */
     public function create(){
+
+        // TODO: Authenticate Admin here
+
+
         // Checking method
-        if($_SERVER['REQUEST_METHOD'] != 'POST'){
-            Response::content("Invalid http method", 405);
+        if($_SERVER['REQUEST_METHOD'] != "POST"){
+            Response::content("Invalid http request method", 405);
             return;
         }
         
@@ -30,7 +34,7 @@ class Movies extends Controller {
 
         // Checking request input
         if(!isset($data['name']) || !isset($data['imdb_url']) || !isset($data['rating'])){
-            Response::content("Creation request misses critical input data", 400);
+            Response::content("Creation request missing critical input data", 400);
             return;
         }
 
@@ -58,12 +62,18 @@ class Movies extends Controller {
     */
     public function get($id = null){
 
+        if($_SERVER['REQUEST_METHOD'] != 'GET'){
+            Response::content("Invalid http request method!", 405);
+            return;
+        }
+
         if($id == null){
-            echo json_encode($this->movies->getAll());
+            $data = $this->movies->getAll();
         }
         else{
-            echo json_encode($this->movies->getById($id));
+            $data = $this->movies->getById($id);
         }
+        Response::content($data, 200);
         
     }
 
@@ -73,8 +83,30 @@ class Movies extends Controller {
         update an existing movie information
     */
     public function update($id){
-        // TODO: Change method to handle PUT request
-        $this->movies->updateMovie($id, $_POST);
+
+        // TODO: Authenticate Admin here
+
+
+        if($_SERVER['REQUEST_METHOD'] != "PUT"){
+            Response::content("Invalid http request method!", 405);
+            return;
+        }
+
+        $data = process_request();
+
+        if(!isset($data) || empty($data)){
+            // No update information given
+            Response::content("Request dosen't contain update information", 400);
+            return;
+        }
+
+        $updated = $this->movies->updateMovie($id, $data);
+        if($updated){
+            Response::content("Movie updated!", 200);
+        }
+        else{
+            Response::content("Failed to update movie", 400);
+        }
     }
 
     /*
@@ -83,7 +115,19 @@ class Movies extends Controller {
         deletes an existing movie from the database
     */
     public function delete($id){
-        $this->movies->deleteMovie($id);
+        // TODO: Authenticate Admin here
+
+        if($_SERVER['REQUEST_METHOD'] != "DELETE"){
+            Response::content("Invalid http request method!", 405);
+            return;
+        }
+        
+        if($this->movies->deleteMovie($id)){
+            Response::content("Movie deleted from database", 200);
+        }
+        else{
+            Response::content("Failed to delete movie", 400);
+        }
     }
 
 
@@ -93,18 +137,29 @@ class Movies extends Controller {
         increment a given movie's votes(thumbs up action)
     */
     public function vote($id){
+        // TODO: Authenticate User here
+        // TODO: Check if user already voted
+
+
+        if($_SERVER['REQUEST_METHOD'] != "PUT"){
+            Response::content("Invalid http request method!", 405);
+            return;
+        }
+
+        // Voting for movie
         $movie = $this->movies->getById($id);
-        $this->movies->updateMovie($id, ['votes' => $movie['votes'] + 1]);
+        $voted = $this->movies->updateMovie($id, ['votes' => $movie['votes'] + 1]);
+
+        // Responding according to result
+        if($voted){
+            Response::content("Voted successfully!", 200);
+        }
+        else{
+            Response::content("Unable to vote for this movie", 400);
+        }
     }
 
 
 
 }
-
-
-
-
-
-
-
 
